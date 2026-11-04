@@ -22,6 +22,15 @@ Serve this folder with any static web server and open `Html.html`. For example, 
 
 The app loads several libraries from CDNs, so an internet connection is required for those features.
 
+## Tests
+
+```bash
+npm i -D jsdom
+node tests/lock-gate.test.mjs
+```
+
+`tests/lock-gate.test.mjs` runs a jsdom smoke test of the PIN gate: first-run setup, keypad input, wrong/correct PIN, re-lock on refresh, data still readable after unlock, and the 5-attempt / 30-second cooldown (which survives a reload).
+
 ## Deploy
 
 The site is deployed on Vercel as a static project; `vercel.json` rewrites `/` to `Html.html`.
