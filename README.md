@@ -9,6 +9,7 @@ A browser-based accounting and statement management app with a Thai-first interf
 - Review statement opening and closing balances, carry balances between months, and flag possible duplicates.
 - Create savings goals and track progress without changing transaction totals.
 - Generate reports and tax invoices, and back up or restore app data.
+- Lock the app with a PIN — stored data is encrypted at rest with AES-GCM (where the browser supports WebCrypto), and backups include slip images.
 - Switch between Thai and English, and dark and light themes.
 
 ## Run locally
