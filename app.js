@@ -96,7 +96,8 @@ const DEFAULT = {
   settings: {
     lang:'th', theme:'dark', entityType:'corporate', name:'บริษัท ตัวอย่าง จำกัด', position:'กรรมการผู้จัดการ',
     companyId:'0105560000001', taxId:'0105560000001', address:'99/9 อาคารพรอสเพอร์ ถนนสุขุมวิท กรุงเทพฯ',
-    approver:'สมชาย ใจดี', approverPos:'ผู้จัดการฝ่ายบัญชีและการเงิน', logo:'', signature:'', myNames:'', myAccounts:'', myBanks:[], budget:50000, docSeq:1
+    approver:'สมชาย ใจดี', approverPos:'ผู้จัดการฝ่ายบัญชีและการเงิน', logo:'', signature:'', myNames:'', myAccounts:'', myBanks:[], budget:50000, docSeq:1,
+    idleLock:5   // v5: ล็อคอัตโนมัติเมื่อไม่ใช้งาน (นาที) · 0 = ปิด
   }
 };
 const ICONS = {'เงินเดือน':'💼','รับโอน':'📥','ขายสินค้า/บริการ':'🛍️','ฟรีแลนซ์':'💻','โบนัส':'🎁','ดอกเบี้ย/ปันผล':'📈',
@@ -194,6 +195,8 @@ function stateFromRaw(raw){
 }
 let encSaveTimer = null;
 function save(){
+  // ความปลอดภัย: ถ้ามีข้อมูลเข้ารหัสอยู่ในเครื่องแต่ยังไม่ปลดล็อค ห้ามเขียนทับด้วยข้อความธรรมดา
+  if(lockRec && lockRec.enc === 'AES-GCM' && !encRaw) return;
   if(encRaw && lockRec && lockRec.enc === 'AES-GCM'){
     clearTimeout(encSaveTimer);
     encSaveTimer = setTimeout(async () => {
@@ -224,6 +227,8 @@ let lockRec = null, encRaw = null;
 /* ================= ความปลอดภัย: PIN lock + เข้ารหัสข้อมูล (AES-GCM) ================= */
 const LOCK_KEY = 'slipbook-promax-lock-v1';
 const SESS_KEY = 'slipbook-promax-session-v1';
+const ATTEMPT_KEY = 'slipbook-promax-attempts-v1';   // v5: นับครั้งที่ใส่รหัสผิด
+const LAST_UNLOCK_KEY = 'slipbook-promax-lastunlock-v1'; // v5: เวลาเข้าใช้งานล่าสุด
 
 // SHA-256 แบบ JS (fallback กรณีไม่มี crypto.subtle เช่น เปิดผ่าน file://)
 function sha256Sync(ascii){
@@ -349,6 +354,19 @@ function renderSecStatus(){
   const st = $('#secStatus'); if(st) st.textContent = on ? (lockRec.enc === 'AES-GCM' ? t('sec_status_enc') : t('sec_status_on')) : t('sec_status_off');
   const bSet = $('#btnSetPin'); if(bSet) bSet.textContent = on ? t('sec_change') : t('sec_set');
   const bOff = $('#btnDisablePin'); if(bOff) bOff.style.display = on ? '' : 'none';
+  // v5: สถานะประตูล็อค / เวลาเข้าใช้ล่าสุด / เวลาล็อคอัตโนมัติ
+  const gate = $('#secGateState'); if(gate) gate.textContent = on ? '🔐 ต้องใส่รหัสทุกครั้งที่เปิด/รีเฟรช' : '⚠️ ยังไม่มีรหัส — จะถูกขอตั้งเมื่อเปิดใหม่';
+  const last = $('#secLastUnlock');
+  if(last){
+    let iso = null; try{ iso = localStorage.getItem(LAST_UNLOCK_KEY); }catch(e){}
+    if(iso){
+      const d = new Date(iso);
+      last.textContent = Number.isNaN(d.valueOf()) ? '—'
+        : d.toLocaleString('th-TH', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+    } else last.textContent = '—';
+  }
+  const isel = $('#idleSelect');
+  if(isel && state && state.settings) isel.value = String(state.settings.idleLock ?? 5);
 }
 
 /* ================= นำทางและธีม ================= */
@@ -1649,25 +1667,172 @@ $('#btnWipe').addEventListener('click', async () => {
   location.reload();
 });
 
-/* ================= PIN lock UI ================= */
-let pinMode = 'set';
-$('#btnUnlockApp').addEventListener('click', async () => {
-  const pin = $('#lockPin').value.trim();
-  if(!/^\d{4,6}$/.test(pin)){ $('#lockError').textContent = t('pin_err_short'); return; }
-  const btn = $('#btnUnlockApp'); btn.disabled = true;
-  const ok = await unlockWithPin(pin);
+/* ================= PIN lock UI (v5: บังคับใส่รหัสทุกครั้งที่เข้า/รีเฟรช) ================= */
+let pinMode = 'set';        // โหมดในหน้าตั้งค่า: set | change | disable
+let gateMode = 'unlock';    // โหมดหน้าประตูล็อค: unlock | setup
+let gateStep = 1;           // setup: 1 = กำหนดรหัส, 2 = ยืนยันรหัส
+let pinBuf = '', pinFirst = '', coolTimer = null;
+
+function lockMeta(){ try{ const o = JSON.parse(localStorage.getItem(ATTEMPT_KEY)); return {n:Number(o?.n) || 0, until:Number(o?.until) || 0}; }catch(e){ return {n:0, until:0}; } }
+function setLockMeta(o){ try{ localStorage.setItem(ATTEMPT_KEY, JSON.stringify(o)); }catch(e){} }
+function markUnlocked(){ try{ localStorage.setItem(LAST_UNLOCK_KEY, new Date().toISOString()); }catch(e){} renderSecStatus(); }
+
+function renderDots(){
+  const dots = $('#pinDots'); if(!dots) return;
+  const n = Math.max(6, pinBuf.length);
+  dots.innerHTML = Array.from({length:n}, (_, i) => `<span class="pin-dot ${i < pinBuf.length ? 'on' : ''}"></span>`).join('');
+  const btn = $('#btnUnlockApp'); if(btn && !coolTimer) btn.disabled = pinBuf.length < 4;
+}
+function gateError(msg, shake){
+  const el = $('#lockError'); if(!el) return;
+  el.textContent = msg || '';
+  if(msg && shake !== false){
+    const card = document.querySelector('.lock-card');
+    if(card){ card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); }
+  }
+}
+function startCooldown(until){
+  clearInterval(coolTimer);
+  const btn = $('#btnUnlockApp');
+  const tick = () => {
+    const left = Math.ceil((until - Date.now()) / 1000);
+    if(left <= 0){ clearInterval(coolTimer); coolTimer = null; gateError(''); renderDots(); return; }
+    if(btn) btn.disabled = true;
+    gateError(`ใส่รหัสผิดหลายครั้งเกินไป — ลองใหม่ในอีก ${left} วินาที`, false);
+  };
+  tick(); coolTimer = setInterval(tick, 1000);
+}
+function openGate(mode){
+  gateMode = mode || (lockRec ? 'unlock' : 'setup');
+  gateStep = 1; pinBuf = ''; pinFirst = '';
+  const unlockMode = gateMode === 'unlock';
+  $('#lockTitle').textContent = unlockMode ? 'ใส่รหัสเพื่อเข้าใช้งาน' : 'ตั้งรหัสเข้าใช้งาน';
+  $('#lockSub').textContent = unlockMode
+    ? 'ต้องยืนยันรหัสทุกครั้งที่เปิดเว็บหรือรีเฟรชหน้านี้'
+    : 'กำหนดรหัส 4–6 หลักก่อนเริ่มใช้งานครั้งแรก';
+  $('#btnUnlockApp').textContent = unlockMode ? 'ปลดล็อค' : 'บันทึกรหัสและเข้าใช้งาน';
+  $('#lockSetupHint').style.display = unlockMode ? 'none' : '';
+  $('#btnSkipSetup').style.display = unlockMode ? 'none' : '';
+  $('#btnForgotPin').style.display = unlockMode ? '' : 'none';
+  $('#lockPin').value = '';
+  gateError('');
+  document.body.classList.add('locked');
+  $('#lockScreen').classList.add('show');
+  renderDots();
+  const meta = lockMeta();
+  if(unlockMode && meta.until > Date.now()) startCooldown(meta.until);
+  setTimeout(() => { try{ $('#lockPin').focus({preventScroll:true}); }catch(e){ try{ $('#lockPin').focus(); }catch(_){} } }, 120);
+}
+function hideGate(){
+  $('#lockScreen').classList.remove('show');
+  document.body.classList.remove('locked');
+  gateError('');
+  pinBuf = ''; $('#lockPin').value = '';
+}
+function lockNow(silent){
+  if(!lockRec) return toast('ยังไม่ได้ตั้งรหัส — ไปที่ตั้งค่า → ความปลอดภัย (PIN)', 'err');
+  openGate('unlock');
+  if(!silent) toast('ล็อคแอปแล้ว 🔒', 'ok');
+}
+function pinKey(ch){
+  const meta = lockMeta();
+  if(meta.until > Date.now()) return;
+  if(ch === 'del') pinBuf = pinBuf.slice(0, -1);
+  else if(ch === 'clear') pinBuf = '';
+  else if(/^\d$/.test(ch) && pinBuf.length < 6) pinBuf += ch;
+  $('#lockPin').value = pinBuf;
+  gateError('');
+  renderDots();
+  if(pinBuf.length === 6 && gateMode === 'unlock') submitGate();
+}
+async function submitGate(){
+  const meta = lockMeta();
+  if(meta.until > Date.now()) return;
+  if(pinBuf.length < 4) return gateError('รหัสต้องมีอย่างน้อย 4 หลัก');
+  const btn = $('#btnUnlockApp');
+  btn.disabled = true;
+
+  if(gateMode === 'setup'){
+    if(gateStep === 1){
+      pinFirst = pinBuf; pinBuf = ''; gateStep = 2;
+      $('#lockTitle').textContent = 'ยืนยันรหัสอีกครั้ง';
+      $('#btnUnlockApp').textContent = 'ยืนยันและเข้าใช้งาน';
+      $('#lockPin').value = ''; gateError(''); renderDots();
+      return;
+    }
+    if(pinBuf !== pinFirst){
+      gateStep = 1; pinFirst = ''; pinBuf = '';
+      $('#lockTitle').textContent = 'ตั้งรหัสเข้าใช้งาน';
+      $('#btnUnlockApp').textContent = 'บันทึกรหัสและเข้าใช้งาน';
+      $('#lockPin').value = ''; renderDots();
+      return gateError('รหัสทั้งสองครั้งไม่ตรงกัน ลองใหม่อีกครั้ง');
+    }
+    const pin = pinBuf;
+    try{
+      const raw = await makeLock(pin);
+      if(lockRec.enc === 'AES-GCM'){
+        encRaw = raw;
+        try{ localStorage.setItem(KEY, JSON.stringify(await encryptState(raw, state))); }catch(e){}
+      }
+      try{ sessionStorage.setItem(SESS_KEY, bufToB64(raw)); }catch(e){}
+      setLockMeta({n:0, until:0});
+      markUnlocked();
+      hideGate(); renderSecStatus(); applyI18N(); renderAll();
+      toast('ตั้งรหัสเรียบร้อย — ครั้งต่อไปต้องใส่รหัสทุกครั้ง 🔐', 'ok');
+    }catch(e){ toast('ตั้งรหัสไม่สำเร็จ', 'err'); }
+    return;
+  }
+
+  const ok = await unlockWithPin(pinBuf);
   btn.disabled = false;
-  if(ok){ $('#lockPin').value = ''; $('#lockError').textContent = ''; toast(t('unlocked_ok'), 'ok'); }
-  else { $('#lockError').textContent = t('pin_wrong'); $('#lockPin').value = ''; $('#lockPin').focus(); }
+  if(ok){
+    setLockMeta({n:0, until:0});
+    markUnlocked();
+    pinBuf = ''; $('#lockPin').value = ''; renderDots(); gateError('');
+    toast(t('unlocked_ok') + ' 🔓', 'ok');
+  }else{
+    const m = lockMeta(); m.n = (m.n || 0) + 1;
+    if(m.n >= 5){
+      m.until = Date.now() + 30000; m.n = 0; setLockMeta(m); startCooldown(m.until);
+    }else{
+      setLockMeta(m);
+      pinBuf = ''; $('#lockPin').value = ''; renderDots();
+      gateError(`${t('pin_wrong')} — เหลืออีก ${5 - m.n} ครั้ง`);
+    }
+  }
+}
+$('#btnUnlockApp').addEventListener('click', submitGate);
+$('#lockPin').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); submitGate(); } });
+$('#pinPad')?.addEventListener('click', e => {
+  const b = e.target.closest('[data-key]'); if(!b) return;
+  pinKey(b.dataset.key);
 });
-$('#lockPin').addEventListener('keydown', e => { if(e.key === 'Enter') $('#btnUnlockApp').click(); });
+document.addEventListener('keydown', e => {
+  const gateOpen = $('#lockScreen').classList.contains('show');
+  if(!gateOpen) return;
+  if(/^\d$/.test(e.key)){ e.preventDefault(); pinKey(e.key); }
+  else if(e.key === 'Backspace'){ e.preventDefault(); pinKey('del'); }
+  else if(e.key === 'Escape'){ pinKey('clear'); }
+  else if(e.key === 'Enter'){ e.preventDefault(); submitGate(); }
+});
 $('#btnForgotPin').addEventListener('click', async () => {
   if(!confirm(t('forgot_c1')) || !confirm(t('forgot_c2'))) return;
-  localStorage.removeItem(KEY); localStorage.removeItem(LOCK_KEY);
+  localStorage.removeItem(KEY); localStorage.removeItem(LOCK_KEY); localStorage.removeItem(ATTEMPT_KEY);
   try{ sessionStorage.removeItem(SESS_KEY); }catch(e){}
   if(slipsOK) await SlipDB.clear().catch(() => {});
   location.reload();
 });
+$('#btnSkipSetup').addEventListener('click', () => {
+  if(!confirm('ข้ามการตั้งรหัสใช่ไหม?\nข้อมูลจะไม่ถูกเข้ารหัส และจะไม่มีประตูล็อคจนกว่าจะตั้งรหัสในหน้าตั้งค่า')) return;
+  lockRec = null;
+  hideGate();
+  renderSecStatus(); applyI18N();
+  toast('เข้าใช้งานโดยไม่ตั้งรหัส — แนะนำให้ตั้งที่หน้าตั้งค่าครับ', 'err');
+});
+$('#btnLockNow').addEventListener('click', () => lockNow());
+$('#btnLockQuick')?.addEventListener('click', () => lockNow());
+
+/* ---------- หน้าตั้งค่า: ตั้ง / เปลี่ยน / ปิด PIN ---------- */
 function openPinModal(mode){
   pinMode = mode;
   $('#pinModalTitle').textContent = t(mode === 'change' ? 'pin_modal_change' : mode === 'disable' ? 'pin_modal_disable' : 'pin_modal_set');
@@ -1685,10 +1850,10 @@ $('#btnSavePin').addEventListener('click', async () => {
   if(pinMode !== 'set' && !(await verifyPin(cur))) return toast(t('pin_wrong'), 'err');
   if(pinMode === 'disable'){
     lockRec = null; encRaw = null;
-    localStorage.removeItem(LOCK_KEY);
+    localStorage.removeItem(LOCK_KEY); localStorage.removeItem(ATTEMPT_KEY);
     try{ sessionStorage.removeItem(SESS_KEY); }catch(e){}
     save(); $('#pinModal').classList.remove('show'); renderSecStatus(); applyI18N();
-    return toast(t('pin_ok_off'), 'ok');
+    return toast('ปิดรหัสแล้ว — แต่ระบบบังคับล็อคจะขอตั้งรหัสใหม่เมื่อเปิดครั้งถัดไป', 'err');
   }
   if(!/^\d{4,6}$/.test(p1)) return toast(t('pin_err_short'), 'err');
   if(p1 !== p2) return toast(t('pin_err_mismatch'), 'err');
@@ -1698,23 +1863,58 @@ $('#btnSavePin').addEventListener('click', async () => {
     try{ localStorage.setItem(KEY, JSON.stringify(await encryptState(raw, state))); }catch(e){ toast('เข้ารหัสข้อมูลไม่สำเร็จ', 'err'); }
   } else { encRaw = null; save(); }
   try{ sessionStorage.setItem(SESS_KEY, bufToB64(raw)); }catch(e){}
+  setLockMeta({n:0, until:0}); markUnlocked();
   $('#pinModal').classList.remove('show'); renderSecStatus(); applyI18N();
   toast(t('pin_ok_set'), 'ok');
+});
+$('#idleSelect')?.addEventListener('change', e => {
+  if(!state || !state.settings) return;
+  state.settings.idleLock = Number(e.target.value);
+  save();
+  toast(state.settings.idleLock ? `ล็อคอัตโนมัติเมื่อไม่ใช้งาน ${state.settings.idleLock} นาที` : 'ปิดล็อคอัตโนมัติแล้ว', state.settings.idleLock ? 'ok' : 'err');
+});
+
+/* ---------- ล็อคอัตโนมัติเมื่อไม่ใช้งาน ---------- */
+let lastActivity = Date.now();
+['pointerdown', 'keydown', 'input', 'touchstart', 'wheel'].forEach(ev =>
+  document.addEventListener(ev, () => { lastActivity = Date.now(); }, {passive: true}));
+setInterval(() => {
+  if(!lockRec) return;
+  if($('#lockScreen').classList.contains('show')) return;
+  const mins = Number(state?.settings?.idleLock ?? 5);
+  if(!mins) return;
+  if(Date.now() - lastActivity > mins * 60000) lockNow(true);
+}, 15000);
+
+/* ---------- คีย์ลัด (v5) ---------- */
+document.addEventListener('keydown', e => {
+  if($('#lockScreen').classList.contains('show')) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  const typing = ['input','select','textarea'].includes(tag) || e.target.isContentEditable;
+  if(e.altKey && /^[1-8]$/.test(e.key)){
+    const p = PAGES[Number(e.key) - 1];
+    if(p){ e.preventDefault(); go(p.id); toast(p.title); }
+    return;
+  }
+  if((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key || '').toLowerCase() === 'k'){
+    e.preventDefault(); go('list');
+    const s = $('#fSearch'); if(s){ s.focus(); s.select?.(); }
+    return;
+  }
+  if(e.key === '?' && !typing){ toast('คีย์ลัด: Alt+1…8 เปลี่ยนหน้า · Ctrl/⌘+K ค้นหา · Ctrl/⌘+L ล็อค', 'ok'); }
+  if((e.ctrlKey || e.metaKey) && (e.key || '').toLowerCase() === 'l'){ e.preventDefault(); lockNow(); }
 });
 
 /* ================= เริ่มต้นระบบ ================= */
 (async function init(){
   lockRec = loadLock();
-  const sessionOK = await trySessionUnlock();
   if(!state) state = stateFromRaw(loadStateRaw());
   applyTheme(); applyI18N(); buildNav();
   try{ await SlipDB.open(); slipsOK = true; }catch(e){}
   const m = today().slice(0, 7);
   $('#month').value = m; $('#rMonth').value = m; $('#rFrom').value = m + '-01'; $('#rTo').value = today();
   go('dashboard'); renderSecStatus();
-  if(lockRec && !sessionOK){
-    document.body.classList.add('locked');
-    $('#lockScreen').classList.add('show');
-    setTimeout(() => $('#lockPin').focus(), 100);
-  }
+  // v5: ประตูล็อค — ต้องใส่รหัสทุกครั้งที่เปิด/รีเฟรช (ถ้ายังไม่มีรหัส จะให้ตั้งก่อนเข้าใช้งาน)
+  lastActivity = Date.now();
+  openGate(lockRec ? 'unlock' : 'setup');
 })();
