@@ -1,0 +1,18 @@
+{
+  "name": "SlipBook Pro Max — ระบบบัญชีและภาษี",
+  "short_name": "SlipBook",
+  "description": "ระบบบัญชี สเตจเม้นท์ธนาคาร สลิป และใบกำกับภาษี พร้อมล็อคด้วย PIN และเข้ารหัสในเครื่อง",
+  "lang": "th",
+  "dir": "ltr",
+  "start_url": "./Html.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

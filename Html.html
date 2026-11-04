@@ -4,7 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SlipBook Pro Max — ระบบบัญชีและสเตจเม้นท์ครบวงจร</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#070b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SlipBook">
+<meta name="description" content="SlipBook Pro Max — ระบบบัญชี สเตจเม้นท์ธนาคาร สลิป และใบกำกับภาษี พร้อมล็อคด้วย PIN">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
@@ -30,6 +40,7 @@
         <div id="periodBox"><input type="month" id="month" title="เลือกเดือน"><button class="btn btn-ghost" id="btnAllTime" data-i18n="all_time">ทั้งหมด</button></div>
         <button class="icon-btn" id="btnLang" title="เปลี่ยนภาษา">🌐 TH</button>
         <button class="icon-btn" id="btnTheme" title="สลับธีม">☀️</button>
+        <button class="icon-btn lock-now" id="btnLockNow" title="ล็อคทันที">🔒</button>
       </div>
     </div>
 
@@ -256,8 +267,22 @@
         <div class="card">
           <h2 data-i18n="sec_title">🔒 ความปลอดภัย (PIN)</h2>
           <p class="muted" style="font-size:.85rem;margin-bottom:12px" id="secStatus"></p>
+          <div class="sec-grid">
+            <div class="sec-tile"><span>สถานะประตูล็อค</span><b id="secGateState">บังคับใส่รหัสทุกครั้ง</b></div>
+            <div class="sec-tile"><span>เข้าใช้งานล่าสุด</span><b id="secLastUnlock">—</b></div>
+          </div>
+          <div class="field" style="margin-top:12px">
+            <label class="f">ล็อคอัตโนมัติเมื่อไม่ใช้งาน</label>
+            <select id="idleSelect">
+              <option value="1">1 นาที</option>
+              <option value="5">5 นาที (แนะนำ)</option>
+              <option value="15">15 นาที</option>
+              <option value="0">ปิด (ไม่แนะนำ)</option>
+            </select>
+          </div>
           <div class="inline">
             <button class="btn btn-ghost" id="btnSetPin" data-i18n="sec_set">🔒 ตั้ง PIN ล็อคแอป</button>
+            <button class="btn btn-ghost" id="btnLockQuick">🔒 ล็อคเดี๋ยวนี้</button>
             <button class="btn btn-danger" id="btnDisablePin" data-i18n="sec_disable" style="display:none">🔓 ปิดการล็อค</button>
           </div>
           <p class="muted" style="font-size:.78rem;margin-top:10px" data-i18n="sec_desc">ตั้ง PIN 4–6 หลัก: ทุกครั้งที่เปิดแอปในแท็บใหม่ต้องป้อน PIN และข้อมูลจะถูกเข้ารหัส (AES-GCM) ในเครื่อง ลืม PIN = ต้องล้างข้อมูลทั้งหมด</p>
@@ -333,14 +358,41 @@
 
 <!-- ===== หน้าจอล็อค PIN ===== -->
 <div id="lockScreen">
+  <div class="lock-bg-orb"></div>
+  <div class="lock-bg-orb orb2"></div>
+  <div class="lock-bg-grid"></div>
   <div class="lock-card">
-    <div class="logo" style="margin:0 auto 14px">฿</div>
-    <h2 data-i18n="lock_title">🔒 ป้อน PIN เพื่อเข้าใช้งาน</h2>
-    <p class="muted" style="font-size:.85rem;margin-bottom:16px" data-i18n="lock_sub">แอปนี้ถูกล็อคเพื่อปกป้องข้อมูลทางการเงินของคุณ</p>
-    <div class="field"><input type="password" id="lockPin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" data-i18n-ph="pin_ph" placeholder="PIN 4–6 หลัก"></div>
-    <button class="btn btn-grad btn-block" id="btnUnlockApp" data-i18n="unlock_btn">ปลดล็อค</button>
-    <div id="lockError" style="color:var(--out);font-size:.85rem;margin-top:10px;min-height:20px"></div>
-    <button id="btnForgotPin" style="margin-top:6px;background:none;border:none;color:var(--muted);cursor:pointer;text-decoration:underline;font-size:.8rem" data-i18n="forgot_pin">ลืม PIN? ล้างข้อมูลทั้งหมด</button>
+    <div class="lock-brand">
+      <div class="lock-logo">฿</div>
+      <div class="lock-brand-txt"><b>SlipBook <span>Pro Max</span></b><small>PROTECTED WORKSPACE</small></div>
+    </div>
+    <h2 class="lock-title" id="lockTitle">ใส่รหัสเพื่อเข้าใช้งาน</h2>
+    <p class="lock-sub" id="lockSub">ต้องยืนยันรหัสทุกครั้งที่เปิดหรือรีเฟรชหน้านี้</p>
+
+    <div class="pin-dots" id="pinDots" aria-live="polite"></div>
+    <input type="password" id="lockPin" class="pin-hidden" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="PIN 4–6 หลัก">
+
+    <div class="pin-pad" id="pinPad">
+      <button type="button" data-key="1">1</button>
+      <button type="button" data-key="2">2</button>
+      <button type="button" data-key="3">3</button>
+      <button type="button" data-key="4">4</button>
+      <button type="button" data-key="5">5</button>
+      <button type="button" data-key="6">6</button>
+      <button type="button" data-key="7">7</button>
+      <button type="button" data-key="8">8</button>
+      <button type="button" data-key="9">9</button>
+      <button type="button" data-key="clear" class="pin-key-fn">ล้าง</button>
+      <button type="button" data-key="0">0</button>
+      <button type="button" data-key="del" class="pin-key-fn">⌫</button>
+    </div>
+
+    <div id="lockError" class="lock-error"></div>
+    <button class="btn btn-grad btn-block lock-submit" id="btnUnlockApp">ปลดล็อค</button>
+    <p class="lock-hint" id="lockSetupHint" style="display:none">กำหนดรหัส 4–6 หลักที่จำได้แม่น — ลืมรหัส = ต้องล้างข้อมูลทั้งหมด</p>
+    <button id="btnForgotPin" class="lock-link">ลืมรหัส? ล้างข้อมูลทั้งหมด</button>
+    <button id="btnSkipSetup" class="lock-link" style="display:none">ข้ามไปก่อน (ข้อมูลจะไม่ถูกเข้ารหัส)</button>
+    <div class="lock-foot">🔒 เข้ารหัส AES-GCM · เก็บข้อมูลไว้ในเครื่องนี้เท่านั้น</div>
   </div>
 </div>
 
