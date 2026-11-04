@@ -252,6 +252,16 @@
             <input type="file" id="restoreFile" accept=".json" hidden>
           </div>
         </div>
+
+        <div class="card">
+          <h2 data-i18n="sec_title">🔒 ความปลอดภัย (PIN)</h2>
+          <p class="muted" style="font-size:.85rem;margin-bottom:12px" id="secStatus"></p>
+          <div class="inline">
+            <button class="btn btn-ghost" id="btnSetPin" data-i18n="sec_set">🔒 ตั้ง PIN ล็อคแอป</button>
+            <button class="btn btn-danger" id="btnDisablePin" data-i18n="sec_disable" style="display:none">🔓 ปิดการล็อค</button>
+          </div>
+          <p class="muted" style="font-size:.78rem;margin-top:10px" data-i18n="sec_desc">ตั้ง PIN 4–6 หลัก: ทุกครั้งที่เปิดแอปในแท็บใหม่ต้องป้อน PIN และข้อมูลจะถูกเข้ารหัส (AES-GCM) ในเครื่อง ลืม PIN = ต้องล้างข้อมูลทั้งหมด</p>
+        </div>
       </div>
     </section>
   </div>
@@ -320,6 +330,31 @@
 
 <div class="modal-bg" id="lightbox"><img id="lbImg" alt="สลิป"></div>
 <div class="toast" id="toast"></div>
+
+<!-- ===== หน้าจอล็อค PIN ===== -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="logo" style="margin:0 auto 14px">฿</div>
+    <h2 data-i18n="lock_title">🔒 ป้อน PIN เพื่อเข้าใช้งาน</h2>
+    <p class="muted" style="font-size:.85rem;margin-bottom:16px" data-i18n="lock_sub">แอปนี้ถูกล็อคเพื่อปกป้องข้อมูลทางการเงินของคุณ</p>
+    <div class="field"><input type="password" id="lockPin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" data-i18n-ph="pin_ph" placeholder="PIN 4–6 หลัก"></div>
+    <button class="btn btn-grad btn-block" id="btnUnlockApp" data-i18n="unlock_btn">ปลดล็อค</button>
+    <div id="lockError" style="color:var(--out);font-size:.85rem;margin-top:10px;min-height:20px"></div>
+    <button id="btnForgotPin" style="margin-top:6px;background:none;border:none;color:var(--muted);cursor:pointer;text-decoration:underline;font-size:.8rem" data-i18n="forgot_pin">ลืม PIN? ล้างข้อมูลทั้งหมด</button>
+  </div>
+</div>
+
+<!-- ===== Modal ตั้ง/เปลี่ยน/ปิด PIN ===== -->
+<div class="modal-bg" id="pinModal"><div class="modal" style="max-width:400px">
+  <div class="modal-h"><h2 id="pinModalTitle" style="font-size:1.15rem"></h2><button class="icon-btn sm" data-close>✕</button></div>
+  <div class="field" id="pinFieldCur" style="display:none"><label class="f" data-i18n="pin_cur">PIN ปัจจุบัน</label><input type="password" id="pinInput0" inputmode="numeric" maxlength="6" autocomplete="off"></div>
+  <div class="field" id="pinFieldNew"><label class="f" data-i18n="pin_new">PIN ใหม่ (4–6 หลัก)</label><input type="password" id="pinInput1" inputmode="numeric" maxlength="6" autocomplete="off"></div>
+  <div class="field" id="pinFieldConfirm"><label class="f" data-i18n="pin_confirm">ยืนยัน PIN ใหม่</label><input type="password" id="pinInput2" inputmode="numeric" maxlength="6" autocomplete="off"></div>
+  <div class="inline" style="justify-content:flex-end;margin-top:8px">
+    <button class="btn btn-ghost" data-close data-i18n="cancel">ยกเลิก</button>
+    <button class="btn btn-grad" id="btnSavePin" data-i18n="save">บันทึก</button>
+  </div>
+</div></div>
 
 <script src="app.js"></script>
 </body>

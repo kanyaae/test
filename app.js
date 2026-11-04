@@ -1,4 +1,4 @@
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 /* ================= พจนานุกรมภาษา (TH / EN) ================= */
 const I18N = {
@@ -28,7 +28,18 @@ const I18N = {
     budget_lbl: "งบรายจ่ายต่อเดือน (บาท) · 0 = ไม่ตั้ง", inc_cat: "หมวดหมู่รายรับ", exp_cat: "หมวดหมู่รายจ่าย", add: "เพิ่ม",
     data_mgmt: "จัดการข้อมูล", backup_desc: "ข้อมูลและสเตจเม้นท์ทั้งหมดเก็บในเบราว์เซอร์เครื่องนี้", backup: "💾 สำรองข้อมูล", restore: "📂 กู้คืนข้อมูล", wipe: "🗑 ล้างข้อมูล",
     pwd_title: "🔒 สเตจเม้นท์นี้มีรหัสผ่านป้องกัน", pwd_desc: "กรุณากรอกรหัสผ่านเปิด PDF", cancel: "ยกเลิก", unlock: "ปลดล็อกและอ่านไฟล์",
-    amount_lbl: "จำนวนเงิน (บาท)", date_lbl: "วันที่", time_lbl: "เวลา", cat_lbl: "หมวดหมู่", note_lbl: "รายละเอียด", ref_lbl: "เลขอ้างอิง / บาร์โค้ด", save: "บันทึก"
+    amount_lbl: "จำนวนเงิน (บาท)", date_lbl: "วันที่", time_lbl: "เวลา", cat_lbl: "หมวดหมู่", note_lbl: "รายละเอียด", ref_lbl: "เลขอ้างอิง / บาร์โค้ด", save: "บันทึก",
+    sec_title: "🔒 ความปลอดภัย (PIN)",
+    lock_title: "🔒 ป้อน PIN เพื่อเข้าใช้งาน", lock_sub: "แอปนี้ถูกล็อคเพื่อปกป้องข้อมูลทางการเงินของคุณ", unlock_btn: "ปลดล็อค", pin_ph: "PIN 4–6 หลัก",
+    forgot_pin: "ลืม PIN? ล้างข้อมูลทั้งหมด", forgot_c1: "ลืม PIN แล้วใช่ไหม? ข้อมูลที่เข้ารหัสจะกู้คืนไม่ได้เลย", forgot_c2: "ยืนยันลบข้อมูลและการตั้งค่าทั้งหมดในเครื่องนี้?", pin_wrong: "PIN ไม่ถูกต้อง ลองอีกครั้ง", unlocked_ok: "ปลดล็อคแล้ว",
+    sec_status_on: "🟢 เปิดการล็อคด้วย PIN อยู่ (เบราว์เซอร์นี้ไม่รองรับ WebCrypto — ข้อมูลยังเป็นข้อความธรรมดา)", sec_status_enc: "🟢 เปิดการล็อคอยู่ และข้อมูลถูกเข้ารหัส AES-GCM ในเครื่องนี้", sec_status_off: "⚪ ปิดการล็อคอยู่ — ข้อมูลเก็บเป็นข้อความธรรมดาในเบราว์เซอร์",
+    sec_set: "🔒 ตั้ง PIN ล็อคแอป", sec_change: "✏️ เปลี่ยน PIN", sec_disable: "🔓 ปิดการล็อค",
+    sec_desc: "ตั้ง PIN 4–6 หลัก: ทุกครั้งที่เปิดแอปในแท็บใหม่ต้องป้อน PIN และข้อมูลจะถูกเข้ารหัส (AES-GCM) ในเครื่อง ลืม PIN = ต้องล้างข้อมูลทั้งหมด",
+    pin_modal_set: "ตั้ง PIN ล็อคแอป", pin_modal_change: "เปลี่ยน PIN", pin_modal_disable: "ปิดการล็อค", pin_cur: "PIN ปัจจุบัน", pin_new: "PIN ใหม่ (4–6 หลัก)", pin_confirm: "ยืนยัน PIN ใหม่",
+    pin_err_short: "PIN ต้องเป็นตัวเลข 4–6 หลัก", pin_err_mismatch: "PIN ที่ยืนยันไม่ตรงกัน", pin_ok_set: "ตั้ง PIN แล้ว — ข้อมูลถูกเข้ารหัสและล็อคเรียบร้อย", pin_ok_off: "ปิดการล็อคแล้ว",
+    restore_ok: "กู้คืนข้อมูลสำเร็จ", restore_bad: "ไฟล์สำรองไม่ถูกต้อง", backup_ok: "สำรองข้อมูลแล้ว (รวมรูปสลิป)", backup_plain: "ไฟล์สำรองไม่เข้ารหัส — เก็บรักษาอย่างปลอดภัย", wipe_confirm: "ลบข้อมูลทั้งหมด รวมถึงการล็อค PIN? ย้อนกลับไม่ได้",
+    list_in: "เงินเข้ารวม", list_out: "รายจ่ายรวม", dup_warn: "⚠️ พบรายการที่ยอดเงินและวันที่ตรงกันอยู่แล้ว — อาจเป็นรายการซ้ำ",
+    sec_notice_lock: "🔒 ล็อคด้วย PIN และเก็บในเครื่อง", sec_notice_lock_enc: "🔒 เข้ารหัส AES-GCM + ล็อคด้วย PIN"
   },
   en: {
     brand_sub: "Accounting & Tax Pro Max",
@@ -56,7 +67,18 @@ const I18N = {
     budget_lbl: "Monthly Budget (THB) · 0 = None", inc_cat: "Income Categories", exp_cat: "Expense Categories", add: "Add",
     data_mgmt: "Data Management", backup_desc: "All statements and data are stored locally in your browser", backup: "💾 Backup Data", restore: "📂 Restore Data", wipe: "🗑 Wipe Data",
     pwd_title: "🔒 Protected Statement PDF", pwd_desc: "Please enter PDF password", cancel: "Cancel", unlock: "Unlock & Parse",
-    amount_lbl: "Amount (THB)", date_lbl: "Date", time_lbl: "Time", cat_lbl: "Category", note_lbl: "Description", ref_lbl: "Reference / Barcode", save: "Save"
+    amount_lbl: "Amount (THB)", date_lbl: "Date", time_lbl: "Time", cat_lbl: "Category", note_lbl: "Description", ref_lbl: "Reference / Barcode", save: "Save",
+    sec_title: "🔒 Security (PIN)",
+    lock_title: "🔒 Enter PIN to unlock", lock_sub: "This app is locked to protect your financial data", unlock_btn: "Unlock", pin_ph: "PIN 4–6 digits",
+    forgot_pin: "Forgot PIN? Wipe all data", forgot_c1: "Forgot your PIN? Encrypted data cannot be recovered at all.", forgot_c2: "Confirm wiping ALL data and settings on this device?", pin_wrong: "Wrong PIN. Try again.", unlocked_ok: "Unlocked",
+    sec_status_on: "🟢 PIN lock is ON (this browser lacks WebCrypto — data is still plain text)", sec_status_enc: "🟢 Lock is ON and data is encrypted (AES-GCM) on this device", sec_status_off: "⚪ Lock is OFF — data is stored as plain text in the browser",
+    sec_set: "🔒 Set app PIN", sec_change: "✏️ Change PIN", sec_disable: "🔓 Disable lock",
+    sec_desc: "Set a 4–6 digit PIN: every new tab requires the PIN, and data is encrypted (AES-GCM) on-device. Forgot PIN = wipe everything",
+    pin_modal_set: "Set app PIN", pin_modal_change: "Change PIN", pin_modal_disable: "Disable lock", pin_cur: "Current PIN", pin_new: "New PIN (4–6 digits)", pin_confirm: "Confirm new PIN",
+    pin_err_short: "PIN must be 4–6 digits", pin_err_mismatch: "PINs do not match", pin_ok_set: "PIN set — data encrypted and locked", pin_ok_off: "Lock disabled",
+    restore_ok: "Data restored", restore_bad: "Invalid backup file", backup_ok: "Backup saved (includes slip images)", backup_plain: "Backup file is NOT encrypted — keep it safe", wipe_confirm: "Wipe ALL data including the PIN lock? This cannot be undone",
+    list_in: "Total In", list_out: "Total Expenses", dup_warn: "⚠️ A transaction with the same amount and date already exists — possible duplicate",
+    sec_notice_lock: "🔒 PIN-locked & stored locally", sec_notice_lock_enc: "🔒 AES-GCM encrypted + PIN-locked"
   }
 };
 
@@ -119,18 +141,20 @@ const sortDesc = (a, b) => (b.date + (b.time||'')).localeCompare(a.date + (a.tim
 const sortAsc = (a, b) => (a.date + (a.time||'')).localeCompare(b.date + (b.time||'')) || a.createdAt - b.createdAt;
 
 function t(key){
-  const lang = state.settings.lang || 'th';
+  const lang = (state && state.settings && state.settings.lang) || 'th';
   return I18N[lang]?.[key] || I18N.th[key] || key;
 }
 function applyI18N(){
   $$('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  $$('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
   $('#brandSub').textContent = t('brand_sub');
-  $('#secNotice').textContent = t('sec_notice');
-  $('#btnLang').textContent = (state.settings.lang || 'th') === 'th' ? '🌐 EN' : '🌐 TH';
+  document.documentElement.lang = (state && state.settings.lang) || 'th';
+  $('#secNotice').textContent = lockRec ? (lockRec.enc === 'AES-GCM' ? t('sec_notice_lock_enc') : t('sec_notice_lock')) : t('sec_notice');
+  $('#btnLang').textContent = ((state && state.settings.lang) || 'th') === 'th' ? '🌐 EN' : '🌐 TH';
 }
 $('#btnLang').addEventListener('click', () => {
   state.settings.lang = (state.settings.lang || 'th') === 'th' ? 'en' : 'th';
-  save(); applyI18N(); renderAll();
+  save(); applyI18N(); buildNav(); go(current);
 });
 
 function bahtText(n){
@@ -141,7 +165,10 @@ function bahtText(n){
       if(p === 1 && d === 1) o += 'สิบ'; else if(p === 1 && d === 2) o += 'ยี่สิบ';
       else if(p === 0 && d === 1 && L > 1) o += 'เอ็ด'; else o += D[d] + P[p]; }
     return o; };
-  const rd = s => s.length > 6 ? rd(s.slice(0, -6)) + 'ล้าน' + r6(s.slice(-6)) : r6(s);
+  const rd = s => { const parts = []; while(s.length > 6){ parts.unshift(s.slice(-6)); s = s.slice(0, -6); } parts.unshift(s);
+    const mult = ['', 'ล้าน', 'ล้านล้าน', 'ล้านล้านล้าน', 'ล้านล้านล้านล้าน']; let out = '';
+    for(let i = 0; i < parts.length; i++){ const g = r6(parts[i]); if(g) out += g + (mult[parts.length - 1 - i] || ''); }
+    return out; };
   const [b, st] = n.toFixed(2).split('.');
   const bt = rd(b), stt = r6(st);
   if(!bt && !stt) return 'ศูนย์บาทถ้วน';
@@ -153,21 +180,28 @@ function toast(msg, kind = ''){
 }
 
 /* ================= จัดเก็บข้อมูล ================= */
-function loadState(){
+function loadStateRaw(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function stateFromRaw(raw){
   const base = clone(DEFAULT);
-  try{
-    const raw = JSON.parse(localStorage.getItem(KEY));
-    if(raw && Array.isArray(raw.transactions)){
-      base.transactions = raw.transactions;
-      if(raw.projects) base.projects = raw.projects;
-      if(Array.isArray(raw.savingsGoals)) base.savingsGoals = raw.savingsGoals;
-      if(raw.categories) base.categories = raw.categories;
-      base.settings = {...base.settings, ...(raw.settings || {})};
-    }
-  }catch(e){}
+  if(raw && Array.isArray(raw.transactions)){
+    base.transactions = raw.transactions;
+    if(raw.projects) base.projects = raw.projects;
+    if(Array.isArray(raw.savingsGoals)) base.savingsGoals = raw.savingsGoals;
+    if(raw.categories) base.categories = raw.categories;
+    base.settings = {...base.settings, ...(raw.settings || {})};
+  }
   return base;
 }
+let encSaveTimer = null;
 function save(){
+  if(encRaw && lockRec && lockRec.enc === 'AES-GCM'){
+    clearTimeout(encSaveTimer);
+    encSaveTimer = setTimeout(async () => {
+      try{ localStorage.setItem(KEY, JSON.stringify(await encryptState(encRaw, state))); }
+      catch(e){ toast('บันทึกข้อมูลไม่สำเร็จ', 'err'); }
+    }, 250);
+    return;
+  }
   try{ localStorage.setItem(KEY, JSON.stringify(state)); }
   catch(e){ toast('พื้นที่จัดเก็บเต็ม', 'err'); }
 }
@@ -181,9 +215,141 @@ const SlipDB = {
   put(k, v){ return this._q('readwrite', s => s.put(v, k)); },
   get(k){ return this._q('readonly', s => s.get(k)); },
   del(k){ return this._q('readwrite', s => s.delete(k)); },
-  clear(){ return this._q('readwrite', s => s.clear()); }
+  clear(){ return this._q('readwrite', s => s.clear()); },
+  allKeys(){ return this._q('readonly', s => s.getAllKeys()); }
 };
-let state = loadState(), slipsOK = false, current = 'dashboard';
+let state = null, slipsOK = false, current = 'dashboard';
+let lockRec = null, encRaw = null;
+
+/* ================= ความปลอดภัย: PIN lock + เข้ารหัสข้อมูล (AES-GCM) ================= */
+const LOCK_KEY = 'slipbook-promax-lock-v1';
+const SESS_KEY = 'slipbook-promax-session-v1';
+
+// SHA-256 แบบ JS (fallback กรณีไม่มี crypto.subtle เช่น เปิดผ่าน file://)
+function sha256Sync(ascii){
+  function rr(v, a){ return (v >>> a) | (v << (32 - a)); }
+  const maxWord = Math.pow(2, 32); let result = '';
+  const words = []; const asciiBitLength = ascii.length * 8;
+  let hash = sha256Sync.h = sha256Sync.h || []; const k = sha256Sync.k = sha256Sync.k || [];
+  let primeCounter = k.length; const isComposite = {};
+  for(let candidate = 2; primeCounter < 64; candidate++){
+    if(!isComposite[candidate]){
+      for(let i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+      hash[primeCounter] = (Math.pow(candidate, .5) * maxWord) | 0;
+      k[primeCounter++] = (Math.pow(candidate, 1 / 3) * maxWord) | 0;
+    }
+  }
+  ascii += '\x80';
+  while(ascii.length % 64 - 56) ascii += '\x00';
+  for(let i = 0; i < ascii.length; i++){
+    const j = ascii.charCodeAt(i);
+    if(j >> 8) return sha256Sync('');
+    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words.length] = (asciiBitLength / maxWord) | 0;
+  words[words.length] = asciiBitLength;
+  for(let j = 0; j < words.length;){
+    const w = words.slice(j, j += 16);
+    const oldHash = hash;
+    hash = hash.slice(0, 8);
+    for(let i = 0; i < 64; i++){
+      const w15 = w[i - 15], w2 = w[i - 2];
+      const a = hash[0], e = hash[4];
+      const temp1 = hash[7]
+        + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25))
+        + ((e & hash[5]) ^ ((~e) & hash[6]))
+        + k[i]
+        + (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0);
+      const temp2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+      hash = [(temp1 + temp2) | 0].concat(hash);
+      hash[4] = (hash[4] + temp1) | 0;
+    }
+    for(let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+  }
+  for(let i = 0; i < 8; i++){
+    for(let j = 3; j + 1; j--){
+      const b = (hash[i] >> (j * 8)) & 255;
+      result += ((b < 16) ? '0' : '') + b.toString(16);
+    }
+  }
+  return result;
+}
+const bufToB64 = buf => { const u = new Uint8Array(buf); let s = ''; for(let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+const b64ToBuf = s => { const bin = atob(s); const u = new Uint8Array(bin.length); for(let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+
+function loadLock(){ try{ const r = JSON.parse(localStorage.getItem(LOCK_KEY)); return (r && r.salt && r.hash) ? r : null; }catch(e){ return null; } }
+
+async function deriveRaw(pin, saltB64){
+  if(window.crypto && crypto.subtle){
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({name:'PBKDF2', salt: b64ToBuf(saltB64), iterations: 120000, hash:'SHA-256'}, base, 256);
+    return new Uint8Array(bits);
+  }
+  let x = saltB64 + ':' + pin;
+  for(let i = 0; i < 20000; i++) x = sha256Sync(x);
+  return new TextEncoder().encode(x);
+}
+async function hashRaw(raw){
+  if(window.crypto && crypto.subtle) return bufToB64(await crypto.subtle.digest('SHA-256', raw));
+  return sha256Sync(bufToB64(raw));
+}
+async function verifyPin(pin){
+  if(!lockRec) return false;
+  return (await hashRaw(await deriveRaw(pin, lockRec.salt))) === lockRec.hash;
+}
+async function makeLock(pin){
+  const salt = (window.crypto && crypto.getRandomValues) ? crypto.getRandomValues(new Uint8Array(16)) : Uint8Array.from({length:16}, () => Math.floor(Math.random() * 256));
+  const saltB64 = bufToB64(salt);
+  const raw = await deriveRaw(pin, saltB64);
+  lockRec = {v:1, salt: saltB64, hash: await hashRaw(raw), enc: (window.crypto && crypto.subtle) ? 'AES-GCM' : null};
+  localStorage.setItem(LOCK_KEY, JSON.stringify(lockRec));
+  return raw;
+}
+async function encryptState(raw, obj){
+  const key = await crypto.subtle.importKey('raw', raw, {name:'AES-GCM'}, false, ['encrypt']);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const data = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, new TextEncoder().encode(JSON.stringify(obj)));
+  return {enc:'AES-GCM', iv: bufToB64(iv), data: bufToB64(data)};
+}
+async function decryptState(raw, rec){
+  const key = await crypto.subtle.importKey('raw', raw, {name:'AES-GCM'}, false, ['decrypt']);
+  const plain = await crypto.subtle.decrypt({name:'AES-GCM', iv: b64ToBuf(rec.iv)}, key, b64ToBuf(rec.data));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+async function loadDecryptedState(){
+  const rawState = loadStateRaw();
+  if(rawState && rawState.enc === 'AES-GCM' && encRaw){
+    try{ return stateFromRaw(await decryptState(encRaw, rawState)); }catch(e){ return stateFromRaw(null); }
+  }
+  return stateFromRaw(rawState);
+}
+async function unlockWithPin(pin){
+  if(!lockRec || !(await verifyPin(pin))) return false;
+  const raw = await deriveRaw(pin, lockRec.salt);
+  encRaw = lockRec.enc === 'AES-GCM' ? raw : null;
+  try{ sessionStorage.setItem(SESS_KEY, bufToB64(raw)); }catch(e){}
+  state = await loadDecryptedState();
+  $('#lockScreen').classList.remove('show');
+  document.body.classList.remove('locked');
+  applyI18N(); buildNav(); applyTheme(); go(current); renderSecStatus();
+  return true;
+}
+async function trySessionUnlock(){
+  if(!lockRec) return false;
+  let s; try{ s = sessionStorage.getItem(SESS_KEY); }catch(e){ return false; }
+  if(!s) return false;
+  const raw = b64ToBuf(s);
+  if((await hashRaw(raw)) !== lockRec.hash) return false;
+  encRaw = lockRec.enc === 'AES-GCM' ? raw : null;
+  state = await loadDecryptedState();
+  return true;
+}
+function renderSecStatus(){
+  const on = !!lockRec;
+  const st = $('#secStatus'); if(st) st.textContent = on ? (lockRec.enc === 'AES-GCM' ? t('sec_status_enc') : t('sec_status_on')) : t('sec_status_off');
+  const bSet = $('#btnSetPin'); if(bSet) bSet.textContent = on ? t('sec_change') : t('sec_set');
+  const bOff = $('#btnDisablePin'); if(bOff) bOff.style.display = on ? '' : 'none';
+}
 
 /* ================= นำทางและธีม ================= */
 function buildNav(){
@@ -316,8 +482,9 @@ $('#goalContributeForm').addEventListener('submit', e => {
 });
 
 function applyTheme(){
-  document.documentElement.dataset.theme = state.settings.theme || 'dark';
-  $('#btnTheme').textContent = state.settings.theme === 'light' ? '🌙' : '☀️';
+  const th = (state && state.settings.theme) || 'dark';
+  document.documentElement.dataset.theme = th;
+  $('#btnTheme').textContent = th === 'light' ? '🌙' : '☀️';
 }
 $('#btnTheme').addEventListener('click', () => {
   state.settings.theme = state.settings.theme === 'light' ? 'dark' : 'light';
@@ -434,9 +601,9 @@ function renderList(){
     (!q || [t.note, t.category, t.ref, t.bank, t.project].some(v => (v || '').toLowerCase().includes(q)))).sort(sortDesc);
   const income = sumT(rows, 'income'), expense = sumT(rows, 'expense');
   $('#listOverview').innerHTML = `
-    <div class="list-total income-total"><span>เงินเข้ารวม</span><strong>+${fmt(income)}</strong></div>
-    <div class="list-total expense-total"><span>เงินออกรวม</span><strong>−${fmt(expense)}</strong></div>
-    <div class="list-total balance-total"><span>คงเหลือสุทธิ</span><strong class="${income >= expense ? 'in' : 'out'}">${fmt(income - expense)}</strong></div>`;
+    <div class="list-total income-total"><span>${t('list_in')}</span><strong>+${fmt(income)}</strong></div>
+    <div class="list-total expense-total"><span>${t('list_out')}</span><strong>−${fmt(expense)}</strong></div>
+    <div class="list-total balance-total"><span>${t('net_balance')}</span><strong class="${income >= expense ? 'in' : 'out'}">${fmt(income - expense)}</strong></div>`;
   $('#listSum').textContent = `${rows.length} รายการ · แสดงตามเดือนและตัวกรองที่เลือก`;
   if(!rows.length){ $('#txList').innerHTML = emptyHTML('ไม่พบรายการ', 'ลองเปลี่ยนเดือนหรือตัวกรอง'); return; }
   const g = {}; rows.forEach(t => (g[t.date] = g[t.date] || []).push(t));
@@ -472,6 +639,7 @@ async function loadStatementPdf(file, password){
 }
 
 async function handleStmtFile(file){
+  if(typeof pdfjsLib === 'undefined'){ toast('โหลดไลบรารีอ่าน PDF ไม่สำเร็จ — ครั้งแรกต้องเปิดผ่านอินเทอร์เน็ต', 'err'); return; }
   if(!file || (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf'))){
     toast('กรุณาอัปโหลดไฟล์ PDF สเตจเม้นท์ธนาคาร', 'err');
     return;
@@ -637,12 +805,14 @@ function parseStatementText(text){
     const amounts = [...line.matchAll(amtRe)]
       .map(match => Number(match[0].replace(/,/g, '')));
     if(!amounts.length) return;
-    const amt = amounts.find(amount => amount > 0);
+    const candidates = amounts.length > 1 ? amounts.slice(0, -1) : amounts; // ตัดยอดคงเหลือ (คอลัมน์สุดท้าย) ออกเมื่อมีหลายตัวเลข
+    const amt = candidates.find(amount => amount > 0);
     if(amt === undefined) return;
 
     const timeMatch = /\b([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?\b/.exec(line);
     const time = timeMatch ? `${pad(timeMatch[1])}:${timeMatch[2]}` : '';
-    const direction = outgoingRe.test(line) ? 'expense' : incomingRe.test(line) ? 'income' : '';
+    const strongInRe = /คืนเงิน|ดอกเบี้ย|รับโอน|รับชำระ|รับเงิน|เงินเข้า|ฝากเงิน|โอนเข้า|credit|deposit/i;
+    const direction = strongInRe.test(line) ? 'income' : outgoingRe.test(line) ? 'expense' : incomingRe.test(line) ? 'income' : '';
     const note = line
       .replace(statementDate.raw, '')
       .replace(/\b([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?\b/, '')
@@ -656,7 +826,7 @@ function parseStatementText(text){
       category: direction === 'income' ? 'รับโอน' : direction === 'expense' ? 'เงินออก' : 'รอตรวจสอบ',
       note: note || 'รายการจากสเตจเม้นท์',
       ref: 'STM-' + Math.floor(Math.random()*1000000), bank: 'ธนาคาร',
-      source: 'statement', project: state.projects[0] || ''
+      source: 'statement', project: ''
     });
   });
   return parsed;
@@ -860,7 +1030,7 @@ function parseStatementTable(file){
         category:type === 'income' ? 'รับโอน' : 'เงินออก',
         note:String(row[noteCol] || 'รายการจากไฟล์ตาราง').trim().slice(0, 80),
         ref:refCol >= 0 ? String(row[refCol] || '') : '',
-        bank:'ธนาคาร', source:'statement', project:state.projects[0] || ''
+        bank:'ธนาคาร', source:'statement', project:''
       };
       txs.push(tx);
       if(balanceCol >= 0 && String(row[balanceCol]).trim()){
@@ -989,7 +1159,7 @@ $('#btnPrintInv').addEventListener('click', () => {
   const addr = $('#invAddr').value.trim() || '-';
   const item = $('#invItemName').value.trim() || 'ค่าบริการ';
   const amt = parseFloat($('#invAmount').value) || 0;
-  if(!amt) return toast('กรุณาระบุจำนวนเงิน', 'err');
+  if(!(amt > 0)) return toast('กรุณาระบุจำนวนเงิน', 'err');
 
   const hasVat = $('#invVat').checked;
   const whtRate = $('#invWht3').checked ? 0.03 : $('#invWht5').checked ? 0.05 : 0;
@@ -1016,7 +1186,7 @@ $('#btnPrintInv').addEventListener('click', () => {
     </style></head><body>
     <div class="head">
       <div><h2>${esc(s.name)}</h2><p>${esc(s.address)}<br>เลขประจำตัวผู้เสียภาษี: ${esc(s.taxId)}</p></div>
-      <div class="title"><h2>ใบเสร็จรับเงิน / ใบกำกับภาษี</h2><p>เลขที่: INV-${today().replace(/-/g,'')}<b><br>วันที่: ${thDate(today())}</b></p></div>
+      <div class="title"><h2>ใบเสร็จรับเงิน / ใบกำกับภาษี</h2><p>เลขที่: INV-${today().replace(/-/g,'')}<br>วันที่: <b>${thDate(today())}</b></p></div>
     </div>
     <div class="info">
       <div><b>นามผู้ซื้อ / ลูกค้า:</b><br>${esc(cust)}<br>${esc(addr).replace(/\n/g,'<br>')}</div>
@@ -1037,7 +1207,7 @@ $('#btnPrintInv').addEventListener('click', () => {
 
 $('#btnSaveInvTx').addEventListener('click', () => {
   const amt = parseFloat($('#invAmount').value) || 0;
-  if(!amt) return toast('กรุณาระบุจำนวนเงิน', 'err');
+  if(!(amt > 0)) return toast('กรุณาระบุจำนวนเงิน', 'err');
   const hasVat = $('#invVat').checked;
   const whtRate = $('#invWht3').checked ? 0.03 : $('#invWht5').checked ? 0.05 : 0;
   state.transactions.push({
@@ -1075,14 +1245,26 @@ function parseTLV(s){
 }
 function parseSlipQR(text){
   const top = parseTLV(text);
-  if(top['00']){ const inner = parseTLV(top['00']); if(inner['01']){ const code = inner['01']; return {isSlip:true, bankCode:code, bank:BANKS[code]?'ธ.'+BANKS[code]:'', ref:inner['02']||''}; } }
-  return {isSlip:false};
+  if(!top || top['00'] !== '01') return {isSlip:false};
+  // ข้อมูล PromptPay อยู่ใน tag 29 (AnyID) หรือ 30 (Bill Payment): sub 00=AID, 01=เบอร์, 02=เลขบัตร, 03=e-wallet, 04=เลขบัญชี (3 หลักแรก = รหัสธนาคาร)
+  const acct = top['29'] ? parseTLV(top['29']) : top['30'] ? parseTLV(top['30']) : null;
+  if(!acct || !acct['00']) return {isSlip:false};
+  let bank = '', ref = '';
+  if(acct['04']){ const code = acct['04'].slice(0, 3); bank = BANKS[code] ? 'ธ.' + BANKS[code] : ''; ref = acct['04'].slice(3); }
+  else if(acct['01']) ref = acct['01'].replace(/^0066/, '0');
+  else if(acct['02']) ref = acct['02'];
+  else if(acct['03']) ref = acct['03'];
+  let extraRef = '';
+  if(top['62']){ const ad = parseTLV(top['62']); extraRef = ad['05'] || ad['07'] || ''; }
+  const amount = top['54'] !== undefined ? Number(top['54']) : '';
+  return {isSlip:true, bank, ref: ref || extraRef || '', amount: Number.isFinite(amount) ? amount : '', name: top['59'] || ''};
 }
 
 let queue = [], busy = false;
 function handleFiles(files){
   const imgs = [...files].filter(f => f.type.startsWith('image/'));
   if(!imgs.length) return toast('รองรับเฉพาะไฟล์รูปภาพ', 'err');
+  setMatchWarn('');
   imgs.forEach(f => queue.push({id:uid(), file:f, status:'wait', progress:0, msg:'รอคิว...'}));
   renderQueue(); if(!busy) runQueue();
 }
@@ -1097,9 +1279,27 @@ async function processItem(it){
     const img = await loadImg(it.file);
     it.thumb = toDataURL(img, 1000, .8);
     const qrText = scanQR(img); it.qr = qrText ? parseSlipQR(qrText) : null;
-    it.type = ''; it.amount = ''; it.date = ''; it.time = '';
-    it.ref = it.qr?.ref || '';
-    it.bank = it.qr?.bank || ''; it.category = ''; it.note = '';
+    it.type = ''; it.amount = ''; it.date = ''; it.time = ''; it.category = ''; it.note = '';
+    if(it.qr && it.qr.isSlip){
+      it.ref = it.qr.ref || '';
+      it.bank = it.qr.bank || '';
+      if(it.qr.amount) it.amount = it.qr.amount;
+      if(it.qr.name) it.note = it.qr.name;
+    } else { it.ref = ''; it.bank = ''; }
+    // OCR — ดึงยอดเงิน/วันที่/เวลาจากรูปสลิป (เมื่อโหลด Tesseract สำเร็จ) สำหรับกรณีที่ QR ไม่มี
+    if(typeof Tesseract !== 'undefined'){
+      it.msg = 'กำลังอ่านข้อความจากสลิป (OCR)...'; renderQueue();
+      try{
+        const r = await Tesseract.recognize(it.file, 'tha+eng');
+        const txt = (r && r.data && r.data.text) || '';
+        if(txt){
+          if(!it.amount){ const amts = [...txt.matchAll(/(\d{1,3}(?:,\d{3})+|\d+)\.\d{2}/g)].map(m => Number(m[1].replace(/,/g, ''))); if(amts.length) it.amount = Math.max(...amts); }
+          if(!it.date){ const dm = parseStatementDate(txt); if(dm) it.date = dm.date; }
+          if(!it.time){ const tm = /\b([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?\b/.exec(txt); if(tm) it.time = `${pad(tm[1])}:${tm[2]}`; }
+        }
+      }catch(err){ /* OCR ล้มเหลว — กรอกมือได้ */ }
+    }
+    if(!it.date) it.date = today();
     it.status = 'ready'; URL.revokeObjectURL(img.src);
   }catch(e){ it.status = 'error'; it.msg = 'อ่านไฟล์ไม่สำเร็จ'; }
   renderQueue();
@@ -1124,11 +1324,15 @@ function qCard(q){
       <div class="q-actions"><button class="btn btn-ghost" data-qrm="${q.id}">ลบ</button><button class="btn btn-grad" data-qsave="${q.id}" ${q.status !== 'ready' ? 'disabled' : ''}>บันทึก</button></div>
     </div></div>`;
 }
+function setMatchWarn(msg){ const el = $('#matchWarn'); el.innerHTML = msg ? `<div class="alert">${esc(msg)}</div>` : ''; }
 function saveQueuedSlip(q){
   if(q.status !== 'ready' || !['income', 'expense'].includes(q.type) || !(Number(q.amount) > 0) || !q.date || !q.category) return false;
-  const tx = {id:uid(), createdAt:Date.now(), type:q.type, amount:+q.amount, category:q.category, date:q.date, time:q.time, note:q.note, ref:q.ref, bank:q.bank, source:'slip', hasSlip:true, project:state.projects[0]||''};
+  const amount = Math.round(+q.amount * 100) / 100;
+  const dup = state.transactions.find(t => t.date === q.date && t.type === q.type && Math.abs(t.amount - amount) < 0.005);
+  const tx = {id:uid(), createdAt:Date.now(), type:q.type, amount, category:q.category, date:q.date, time:q.time, note:q.note, ref:q.ref, bank:q.bank, source:'slip', hasSlip:true, project:q.project || ''};
   state.transactions.push(tx);
   if(slipsOK) SlipDB.put(tx.id, q.thumb).catch(() => {});
+  if(dup) setMatchWarn(t('dup_warn'));
   return true;
 }
 function updateQueueField(e){
@@ -1230,9 +1434,16 @@ async function buildDoc(){
   const corpDetails = s.entityType === 'corporate' ? `<p>เลขทะเบียนนิติบุคคล: ${esc(s.companyId || '-')} | เลขประจำตัวผู้เสียภาษี: ${esc(s.taxId || '-')}</p>` : '';
   const dots = '..............................................';
 
-  return `<div id="doc">
+    let appendix = '';
+  if(o.slips){
+    const ids = list.filter(t => t.hasSlip).map(t => t.id).slice(0, 40);
+    const imgs = slipsOK ? (await Promise.all(ids.map(id => SlipDB.get(id).catch(() => null)))).filter(Boolean) : [];
+    if(imgs.length) appendix = `<div style="page-break-before:always;margin-top:18px"><h3 style="color:#1e3a8a;font-size:15px">ภาคผนวก — ภาพสลิป (${imgs.length} รูป)</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">${imgs.map(src => `<img src="${esc(src)}" style="width:100%;border:1px solid #d1d5db;border-radius:6px">`).join('')}</div></div>`;
+  }
+
+return `<div id="doc">
     <div class="d-head">
-      <div class="d-org">${s.logo ? `<img src="${s.logo}" style="width:60px;height:60px;object-fit:contain">` : ''}<div>
+      <div class="d-org">${s.logo ? `<img src="${esc(s.logo)}" style="width:60px;height:60px;object-fit:contain">` : ''}<div>
         <h2>${esc(s.name || 'ชื่อผู้จัดทำ / กิจการ')}</h2>
         ${corpDetails}
         ${s.address ? `<p>${esc(s.address)}</p>` : ''}</div></div>
@@ -1255,13 +1466,14 @@ async function buildDoc(){
     </table>
     <div class="d-words"><b>ยอดเงิน (ตัวอักษร):</b> ${net < 0 ? 'ติดลบ ' : ''}${bahtText(net)}</div>
     <div class="d-sigs">
-      <div class="d-sig"><div class="sig-img">${s.signature ? `<img src="${s.signature}">` : ''}</div>
+      <div class="d-sig"><div class="sig-img">${s.signature ? `<img src="${esc(s.signature)}">` : ''}</div>
         <div class="sig-line"><span>ลงชื่อ</span><span class="l"></span><span>ผู้จัดทำ</span></div>
         <div>( ${esc(s.name || dots)} )</div></div>
       ${o.approver ? `<div class="d-sig"><div class="sig-img"></div>
         <div class="sig-line"><span>ลงชื่อ</span><span class="l"></span><span>ผู้อนุมัติ</span></div>
         <div>( ${esc(s.approver || dots)} )</div></div>` : '<div></div>'}
     </div>
+    ${appendix}
   </div>`;
 }
 
@@ -1324,7 +1536,7 @@ function renderSettings(){
   });
   $('#bankList').innerHTML = Object.entries(BANKS).map(([c, n]) =>
     `<label class="check"><input type="checkbox" data-bank="${c}" ${state.settings.myBanks.includes(c) ? 'checked' : ''}> ${n}</label>`).join('');
-  $('#logoPrev').innerHTML = state.settings.logo ? `<img src="${state.settings.logo}">` : 'ไม่มี';
+  $('#logoPrev').innerHTML = state.settings.logo ? `<img src="${esc(state.settings.logo)}">` : 'ไม่มี';
   renderChips(); sizeSig();
 }
 let setTimer;
@@ -1397,34 +1609,112 @@ function download(name, content, mime){
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([content], {type:mime}));
   a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1500);
 }
-$('#btnBackup').addEventListener('click', () => {
-  download(`slipbook-promax-backup-${today()}.json`, JSON.stringify(state), 'application/json');
-  toast('สำรองข้อมูลแล้ว', 'ok');
+$('#btnBackup').addEventListener('click', async () => {
+  let slips = {};
+  if(slipsOK){
+    try{
+      const keys = await SlipDB.allKeys();
+      slips = Object.fromEntries(await Promise.all(keys.map(async k => [k, await SlipDB.get(k)])));
+    }catch(e){}
+  }
+  const payload = {app:'slipbook-promax', version:2, savedAt: today(), state, slips};
+  download(`slipbook-promax-backup-${today()}.json`, JSON.stringify(payload), 'application/json');
+  toast(t('backup_ok') + ' — ' + t('backup_plain'), 'ok');
 });
 $('#btnRestore').addEventListener('click', () => $('#restoreFile').click());
 $('#restoreFile').addEventListener('change', e => {
   const f = e.target.files[0]; if(!f) return;
   const rd = new FileReader();
-  rd.onload = () => {
+  rd.onload = async () => {
     try{
-      const d = JSON.parse(rd.result); if(!Array.isArray(d.transactions)) throw 0;
-      if(!Array.isArray(d.savingsGoals)) d.savingsGoals = [];
-      state = d; save(); applyTheme(); applyI18N(); renderSettings(); toast('กู้คืนข้อมูลสำเร็จ', 'ok');
-    }catch(err){ toast('ไฟล์สำรองไม่ถูกต้อง', 'err'); }
+      const d = JSON.parse(rd.result);
+      const incoming = (d && d.app === 'slipbook-promax' && d.state) ? d.state : d; // รองรับไฟล์สำรองรุ่นเก่า
+      if(!incoming || !Array.isArray(incoming.transactions)) throw 0;
+      state = stateFromRaw(incoming);
+      if(slipsOK && d && d.slips && typeof d.slips === 'object'){
+        await Promise.all(Object.entries(d.slips).map(([k, v]) => SlipDB.put(k, v).catch(() => {})));
+      }
+      save(); applyTheme(); applyI18N(); buildNav(); go(current); renderSettings(); renderSecStatus();
+      toast(t('restore_ok'), 'ok');
+    }catch(err){ toast(t('restore_bad'), 'err'); }
     e.target.value = '';
   };
   rd.readAsText(f);
 });
 $('#btnWipe').addEventListener('click', async () => {
-  if(!confirm('ลบข้อมูลทั้งหมด? การกระทำนี้ย้อนกลับไม่ได้')) return;
-  state = clone(DEFAULT); save(); renderSettings(); toast('ลบข้อมูลทั้งหมดแล้ว');
+  if(!confirm(t('wipe_confirm'))) return;
+  localStorage.removeItem(KEY); localStorage.removeItem(LOCK_KEY);
+  try{ sessionStorage.removeItem(SESS_KEY); }catch(e){}
+  if(slipsOK) await SlipDB.clear().catch(() => {});
+  location.reload();
+});
+
+/* ================= PIN lock UI ================= */
+let pinMode = 'set';
+$('#btnUnlockApp').addEventListener('click', async () => {
+  const pin = $('#lockPin').value.trim();
+  if(!/^\d{4,6}$/.test(pin)){ $('#lockError').textContent = t('pin_err_short'); return; }
+  const btn = $('#btnUnlockApp'); btn.disabled = true;
+  const ok = await unlockWithPin(pin);
+  btn.disabled = false;
+  if(ok){ $('#lockPin').value = ''; $('#lockError').textContent = ''; toast(t('unlocked_ok'), 'ok'); }
+  else { $('#lockError').textContent = t('pin_wrong'); $('#lockPin').value = ''; $('#lockPin').focus(); }
+});
+$('#lockPin').addEventListener('keydown', e => { if(e.key === 'Enter') $('#btnUnlockApp').click(); });
+$('#btnForgotPin').addEventListener('click', async () => {
+  if(!confirm(t('forgot_c1')) || !confirm(t('forgot_c2'))) return;
+  localStorage.removeItem(KEY); localStorage.removeItem(LOCK_KEY);
+  try{ sessionStorage.removeItem(SESS_KEY); }catch(e){}
+  if(slipsOK) await SlipDB.clear().catch(() => {});
+  location.reload();
+});
+function openPinModal(mode){
+  pinMode = mode;
+  $('#pinModalTitle').textContent = t(mode === 'change' ? 'pin_modal_change' : mode === 'disable' ? 'pin_modal_disable' : 'pin_modal_set');
+  $('#pinFieldCur').style.display = mode === 'set' ? 'none' : '';
+  $('#pinFieldNew').style.display = mode === 'disable' ? 'none' : '';
+  $('#pinFieldConfirm').style.display = mode === 'disable' ? 'none' : '';
+  $('#pinInput0').value = ''; $('#pinInput1').value = ''; $('#pinInput2').value = '';
+  $('#pinModal').classList.add('show');
+  setTimeout(() => $(mode === 'set' ? '#pinInput1' : '#pinInput0').focus(), 100);
+}
+$('#btnSetPin').addEventListener('click', () => openPinModal(lockRec ? 'change' : 'set'));
+$('#btnDisablePin').addEventListener('click', () => openPinModal('disable'));
+$('#btnSavePin').addEventListener('click', async () => {
+  const cur = $('#pinInput0').value.trim(), p1 = $('#pinInput1').value.trim(), p2 = $('#pinInput2').value.trim();
+  if(pinMode !== 'set' && !(await verifyPin(cur))) return toast(t('pin_wrong'), 'err');
+  if(pinMode === 'disable'){
+    lockRec = null; encRaw = null;
+    localStorage.removeItem(LOCK_KEY);
+    try{ sessionStorage.removeItem(SESS_KEY); }catch(e){}
+    save(); $('#pinModal').classList.remove('show'); renderSecStatus(); applyI18N();
+    return toast(t('pin_ok_off'), 'ok');
+  }
+  if(!/^\d{4,6}$/.test(p1)) return toast(t('pin_err_short'), 'err');
+  if(p1 !== p2) return toast(t('pin_err_mismatch'), 'err');
+  const raw = await makeLock(p1);
+  if(lockRec.enc === 'AES-GCM'){
+    encRaw = raw;
+    try{ localStorage.setItem(KEY, JSON.stringify(await encryptState(raw, state))); }catch(e){ toast('เข้ารหัสข้อมูลไม่สำเร็จ', 'err'); }
+  } else { encRaw = null; save(); }
+  try{ sessionStorage.setItem(SESS_KEY, bufToB64(raw)); }catch(e){}
+  $('#pinModal').classList.remove('show'); renderSecStatus(); applyI18N();
+  toast(t('pin_ok_set'), 'ok');
 });
 
 /* ================= เริ่มต้นระบบ ================= */
 (async function init(){
+  lockRec = loadLock();
+  const sessionOK = await trySessionUnlock();
+  if(!state) state = stateFromRaw(loadStateRaw());
   applyTheme(); applyI18N(); buildNav();
   try{ await SlipDB.open(); slipsOK = true; }catch(e){}
   const m = today().slice(0, 7);
   $('#month').value = m; $('#rMonth').value = m; $('#rFrom').value = m + '-01'; $('#rTo').value = today();
-  go('dashboard');
+  go('dashboard'); renderSecStatus();
+  if(lockRec && !sessionOK){
+    document.body.classList.add('locked');
+    $('#lockScreen').classList.add('show');
+    setTimeout(() => $('#lockPin').focus(), 100);
+  }
 })();
